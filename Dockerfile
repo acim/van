@@ -5,7 +5,7 @@ RUN --mount=type=cache,target=/var/cache/apk if [ "${TARGETPLATFORM}" = "linux/a
     then apk add --no-cache git upx; fi
 
 WORKDIR /app
-COPY go.mod go.sum ./
+COPY go.mod ./
 RUN --mount=type=cache,target=/go/pkg/mod go mod tidy
 
 COPY . .

@@ -12,7 +12,6 @@ lint:
 		--disable nosnakecase \
 		--disable scopelint \
 		--disable structcheck \
-		--disable tagliatelle \
 		--disable varcheck
 
 test:
