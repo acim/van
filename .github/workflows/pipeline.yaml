@@ -1,0 +1,32 @@
+name: pipeline
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    uses: ectobit/reusable-workflows/.github/workflows/go-check.yaml@main
+  build:
+    uses: ectobit/reusable-workflows/.github/workflows/buildx.yaml@main
+    needs: check
+    with:
+      image: acim/van
+      hadolint-ignore: DL3018
+    secrets:
+      container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+      container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+  deploy:
+    uses: ectobit/reusable-workflows/.github/workflows/deploy.yaml@main
+    needs: build
+    with:
+      image: acim/van
+      tag: ${{ needs.build.outputs.sha-tag }}
+      namespace: repo
+      deployment-name: van
+      container-name: van
+    secrets:
+      kubernetes-server: ${{ secrets.KUBERNETES_SERVER }}
+      kubernetes-token: ${{ secrets.KUBERNETES_TOKEN }}
+      kubernetes-cert: ${{ secrets.KUBERNETES_CERT }}

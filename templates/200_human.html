@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.1.0/modern-normalize.min.css" integrity="sha512-wpPYUAdjBVSE4KJnH1VR1HeZfpl1ub8YT/NKx4PuQ5NmX2tKuGu6U/JRp5y+Y8XG2tV+wKQpNHVUX03MfMFn9Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.0.0/modern-normalize.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css" integrity="sha512-xiunq9hpKsIcz42zt0o2vCo34xV0j6Ny8hgEylN3XBglZDtTZ2nwnqF/Z/TTCc18sGdvCjbFInNd++6q3J0N6g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>{{.ModuleName}}</title>
+  </head>
+  <body>
+    <div class="container">
+    <h2>Module {{.ModuleName}}</h2>
+    <pre><code>go get {{.ModuleName}}</code></pre>
+    <pre><code>import "{{.ModuleName}}"</code><br /></pre>
+      <ul>
+        <li><a href="{{.TargetRepository}}">Source repository</a></li>
+        <li><a href="https://pkg.go.dev/{{.ModuleName}}">Documentation</a></li>
+        <li><a href="https://goreportcard.com/report/{{.ModuleName}}">Go Report Card</a></li>
+      </ul>
+    </div>
+  </body>
+</html>

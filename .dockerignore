@@ -1,0 +1,11 @@
+.dockerignore
+.git
+.github
+.gitignore
+.vscode
+Dockerfile
+LICENSE-APACHE
+LICENSE-MIT
+README.md
+README.md
+resources
