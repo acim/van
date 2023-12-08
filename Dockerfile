@@ -12,7 +12,7 @@ COPY . .
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags='-s -w -extldflags "-static"' -o /app/van .
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then upx /app/app; fi
 
-FROM alpine:3.18.5
+FROM alpine:3.19.0
 
 COPY --from=builder /app/van /usr/local/bin/
 
