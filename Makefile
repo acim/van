@@ -1,18 +1,7 @@
 .PHONY: lint test test-all test-cov
 
 lint:
-	@golangci-lint run \
-		--enable-all \
-		--disable deadcode \
-		--disable exhaustivestruct \
-		--disable golint \
-		--disable ifshort \
-		--disable interfacer \
-		--disable maligned \
-		--disable nosnakecase \
-		--disable scopelint \
-		--disable structcheck \
-		--disable varcheck
+	@golangci-lint run --fix
 
 test:
 	@go test -race -short ./...
