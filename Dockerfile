@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.3
-FROM golang:1.25.2-alpine AS builder
+FROM golang:1.25.3-alpine AS builder
 
 RUN --mount=type=cache,target=/var/cache/apk if [ "${TARGETPLATFORM}" = "linux/amd64" ]; \
     then apk add --no-cache git upx; fi
