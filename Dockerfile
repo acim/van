@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.3
 FROM golang:1.26.4-alpine AS builder
 
+ARG TARGETPLATFORM
+
 RUN --mount=type=cache,target=/var/cache/apk if [ "${TARGETPLATFORM}" = "linux/amd64" ]; \
     then apk add --no-cache git upx; fi
 
@@ -10,7 +12,7 @@ RUN --mount=type=cache,target=/go/pkg/mod go mod tidy
 
 COPY . .
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags='-s -w -extldflags "-static"' -o /app/van .
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then upx /app/app; fi
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then upx /app/van; fi
 
 FROM alpine:3.24.0
 

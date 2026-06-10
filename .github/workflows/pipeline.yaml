@@ -20,6 +20,7 @@ jobs:
       container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
       container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
   deploy:
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
     uses: ectobit/reusable-workflows/.github/workflows/deploy.yaml@main
     needs: build
     with:
@@ -28,7 +29,16 @@ jobs:
       namespace: repo
       deployment-name: van
       container-name: van
+      ssh-tunnel-enabled: true
     secrets:
       kubernetes-server: ${{ secrets.KUBERNETES_SERVER }}
       kubernetes-token: ${{ secrets.KUBERNETES_TOKEN }}
       kubernetes-cert: ${{ secrets.KUBERNETES_CERT }}
+      kubernetes-tls-server-name: ${{ secrets.KUBERNETES_TLS_SERVER_NAME }}
+      ssh-private-key: ${{ secrets.SSH_TUNNEL_PRIVATE_KEY }}
+      ssh-known-hosts: ${{ secrets.SSH_TUNNEL_KNOWN_HOSTS }}
+      ssh-tunnel-host: ${{ secrets.SSH_TUNNEL_HOST }}
+      ssh-tunnel-user: ${{ secrets.SSH_TUNNEL_USER }}
+      ssh-tunnel-local-port: ${{ secrets.SSH_TUNNEL_LOCAL_PORT }}
+      ssh-tunnel-target-host: ${{ secrets.SSH_TUNNEL_TARGET_HOST }}
+      ssh-tunnel-target-port: ${{ secrets.SSH_TUNNEL_TARGET_PORT }}

@@ -1,7 +1,7 @@
 .PHONY: lint test test-all test-cov
 
 lint:
-	@golangci-lint run --fix
+	@golangci-lint run
 
 test:
 	@go test -race -short ./...
