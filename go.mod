@@ -1,3 +1,3 @@
 module go.acim.net/van
 
-go 1.20
+go 1.26.5
