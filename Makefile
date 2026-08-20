@@ -1,4 +1,4 @@
-.PHONY: lint test test-all test-cov
+.PHONY: lint test test-all test-cov update
 
 lint:
 	@golangci-lint run
@@ -12,3 +12,7 @@ test-all:
 test-cov:
 	@go test -coverprofile=coverage.out ./...
 	@go tool cover -func coverage.out
+
+update:
+	@go get -u
+	@go mod tidy
