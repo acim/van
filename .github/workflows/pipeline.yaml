@@ -5,40 +5,82 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Lint GitHub Actions workflows
+        uses: raven-actions/actionlint@v2
+
+  chart-check:
+    needs: actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+        with:
+          version: v3.21.4
+      - name: Lint and render Helm chart
+        run: make chart-check
+
   check:
+    needs: actionlint
     uses: ectobit/reusable-workflows/.github/workflows/go-check.yaml@main
     with:
       lint-command: make lint
   build:
     uses: ectobit/reusable-workflows/.github/workflows/buildx.yaml@main
-    needs: check
+    needs: [check, chart-check]
     with:
       image: acim/van
       hadolint-ignore: DL3018
+      platforms: linux/amd64
+      grype: true
+      grype-fail-build: true
+      grype-severity-cutoff: high
+      grype-sarif-artifact-name: van-grype-sarif
     secrets:
       container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
       container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
   deploy:
-    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-    uses: ectobit/reusable-workflows/.github/workflows/deploy.yaml@main
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: build
-    with:
-      image: acim/van
-      tag: ${{ needs.build.outputs.sha-tag }}
-      namespace: repo
-      deployment-name: van
-      container-name: van
-      ssh-tunnel-enabled: true
-    secrets:
-      kubernetes-server: ${{ secrets.KUBERNETES_SERVER }}
-      kubernetes-token: ${{ secrets.KUBERNETES_TOKEN }}
-      kubernetes-cert: ${{ secrets.KUBERNETES_CERT }}
-      kubernetes-tls-server-name: ${{ secrets.KUBERNETES_TLS_SERVER_NAME }}
-      ssh-private-key: ${{ secrets.SSH_TUNNEL_PRIVATE_KEY }}
-      ssh-known-hosts: ${{ secrets.SSH_TUNNEL_KNOWN_HOSTS }}
-      ssh-tunnel-host: ${{ secrets.SSH_TUNNEL_HOST }}
-      ssh-tunnel-user: ${{ secrets.SSH_TUNNEL_USER }}
-      ssh-tunnel-local-port: ${{ secrets.SSH_TUNNEL_LOCAL_PORT }}
-      ssh-tunnel-target-host: ${{ secrets.SSH_TUNNEL_TARGET_HOST }}
-      ssh-tunnel-target-port: ${{ secrets.SSH_TUNNEL_TARGET_PORT }}
+    runs-on: ubuntu-latest
+    concurrency:
+      group: van-production-deploy
+      cancel-in-progress: false
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+        with:
+          version: v3.21.4
+      - name: Configure Kubernetes access
+        env:
+          KUBERNETES_SERVER: ${{ secrets.KUBERNETES_SERVER }}
+          KUBERNETES_TOKEN: ${{ secrets.KUBERNETES_TOKEN }}
+          KUBERNETES_CERT: ${{ secrets.KUBERNETES_CERT }}
+          KUBERNETES_TLS_SERVER_NAME: ${{ secrets.KUBERNETES_TLS_SERVER_NAME }}
+          SSH_TUNNEL_PRIVATE_KEY: ${{ secrets.SSH_TUNNEL_PRIVATE_KEY }}
+          SSH_TUNNEL_KNOWN_HOSTS: ${{ secrets.SSH_TUNNEL_KNOWN_HOSTS }}
+          SSH_TUNNEL_HOST: ${{ secrets.SSH_TUNNEL_HOST }}
+          SSH_TUNNEL_USER: ${{ secrets.SSH_TUNNEL_USER }}
+          SSH_TUNNEL_LOCAL_PORT: ${{ secrets.SSH_TUNNEL_LOCAL_PORT }}
+          SSH_TUNNEL_TARGET_HOST: ${{ secrets.SSH_TUNNEL_TARGET_HOST }}
+          SSH_TUNNEL_TARGET_PORT: ${{ secrets.SSH_TUNNEL_TARGET_PORT }}
+        run: .github/scripts/configure-kubernetes-access.sh repo
+      - name: Deploy Helm chart
+        env:
+          IMAGE_TAG: ${{ needs.build.outputs.sha-tag }}
+        run: .github/scripts/deploy-van.sh
+      - name: Clean up Kubernetes access
+        if: always()
+        run: .github/scripts/cleanup-kubernetes-access.sh
