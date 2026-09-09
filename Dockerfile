@@ -16,6 +16,8 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then upx /app/van; fi
 
 FROM alpine:3.24.1
 
+RUN apk upgrade --no-cache
+
 COPY --from=builder /app/van /usr/local/bin/
 
 USER 65534:65534
