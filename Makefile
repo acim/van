@@ -1,4 +1,4 @@
-.PHONY: lint test test-all test-cov update chart-check
+.PHONY: lint check test test-all test-cov update chart-check
 
 chart-check:
 	helm lint chart --strict
@@ -8,6 +8,13 @@ chart-check:
 
 lint:
 	@golangci-lint run
+
+# Mirrors the static gates of ectobit/reusable-workflows go-check.yaml in the
+# same order; update both together. Run before every push, with the affected
+# tests. Tests are separate because CI runs them in its own job.
+check: lint
+	govulncheck ./...
+	go fix -diff ./...
 
 test:
 	@go test -race -short ./...

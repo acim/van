@@ -22,7 +22,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler.handle)
 
-	srv := &http.Server{ //nolint:exhaustruct
+	srv := &http.Server{
 		Addr:              ":8080",
 		Handler:           mux,
 		IdleTimeout:       idleTimeout,

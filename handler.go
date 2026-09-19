@@ -59,7 +59,7 @@ func (h *handler) handle(res http.ResponseWriter, req *http.Request) {
 	moduleName := moduleName(req)
 
 	if _, ok := h.mods[moduleName]; !ok {
-		exec(res, h.t404, &data{ //nolint:exhaustruct
+		exec(res, h.t404, &data{
 			ModuleName: moduleName,
 		}, http.StatusNotFound)
 
@@ -95,7 +95,7 @@ func exec(res http.ResponseWriter, t *template.Template, data any, statusCode in
 	}
 
 	res.WriteHeader(statusCode)
-	io.Copy(res, &body) //nolint:errcheck
+	io.Copy(res, &body) //nolint:errcheck // headers are already sent; nothing useful to do on a write error
 }
 
 func moduleName(req *http.Request) string {
