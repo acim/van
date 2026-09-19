@@ -33,8 +33,6 @@ jobs:
   check:
     needs: actionlint
     uses: ectobit/reusable-workflows/.github/workflows/go-check.yaml@main
-    with:
-      lint-command: make lint
   build:
     uses: ectobit/reusable-workflows/.github/workflows/buildx.yaml@main
     needs: [check, chart-check]
