@@ -30,7 +30,7 @@ deployment. Its existing RoleBinding reuses the `default/deploy` ServiceAccount.
 A cluster administrator must apply the infrastructure release after the RBAC
 change is approved. Van owns its chart, production values, and deployment
 pipeline; shared CI identity and deployment permissions remain in infrastructure.
-CI pins Helm 3.21.4 so its API and readiness checks match the RBAC contract.
+CI pins Helm 4.3.1.
 Existing-object access is limited to resources named `van`, except for Helm's
 dynamically named release Secrets and the ReplicaSet list needed by `--wait`.
 Kubernetes RBAC cannot constrain resource creation by name. Autoscaling and
