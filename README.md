@@ -30,7 +30,7 @@ deployment. Its existing RoleBinding reuses the `default/deploy` ServiceAccount.
 A cluster administrator must apply the infrastructure release after the RBAC
 change is approved. Van owns its chart, production values, and deployment
 pipeline; shared CI identity and deployment permissions remain in infrastructure.
-CI pins Helm 4.3.1.
+CI uses the default Helm version selected by `azure/setup-helm@v5`.
 Existing-object writes are limited to resources named `van`, except for Helm's
 dynamically named release Secrets. Helm 4's `--wait` requires namespace-wide
 list/watch access to the chart's ConfigMaps, ServiceAccounts, Services,
