@@ -23,7 +23,7 @@ secrets. The Kubernetes identity must be allowed to manage Helm release Secrets
 and the chart's ConfigMap, ServiceAccount, Service, Deployment, and Ingress in
 `repo`; an identity limited to patching the Deployment image is insufficient.
 Deployment RBAC is managed centrally by the `deploy-role` release in
-`ectobit/infrastructure/helmfile.d/00-infrastructure.yaml.gotmpl`, following the
+`ectobit/infrastructure/helmfile.d/05-deployment-access.yaml.gotmpl`, following the
 other applications. The existing `repo/deploy` Role must be extended with Helm
 permissions, including Secrets for release history, before the first pipeline
 deployment. Its existing RoleBinding reuses the `default/deploy` ServiceAccount.
@@ -31,10 +31,15 @@ A cluster administrator must apply the infrastructure release after the RBAC
 change is approved. Van owns its chart, production values, and deployment
 pipeline; shared CI identity and deployment permissions remain in infrastructure.
 CI pins Helm 4.3.1.
-Existing-object access is limited to resources named `van`, except for Helm's
-dynamically named release Secrets and the ReplicaSet list needed by `--wait`.
+Existing-object writes are limited to resources named `van`, except for Helm's
+dynamically named release Secrets. Helm 4's `--wait` requires namespace-wide
+list/watch access to the chart's ConfigMaps, ServiceAccounts, Services,
+Deployments, and Ingresses; its Deployment status reader also lists generated
+ReplicaSets and Pods. These observation permissions cannot be restricted to
+`resourceNames: ['van']` because the watcher does not use name field selectors.
 Kubernetes RBAC cannot constrain resource creation by name. Autoscaling and
-`helm test` are not enabled in this pipeline and receive no HPA or Pod permissions.
+`helm test` are not enabled in this pipeline and receive no HPA or Pod write
+permissions.
 
 Run `make chart-check` to lint and render the chart locally. To deploy a reviewed
 image manually with an already configured cluster connection:
