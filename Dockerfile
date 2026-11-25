@@ -1,5 +1,5 @@
-# syntax=docker/dockerfile:1.28.0
-FROM golang:1.27.3-alpine AS builder
+# syntax=docker/dockerfile:1.29.0
+FROM golang:1.27.4-alpine AS builder
 
 ARG TARGETPLATFORM
 
