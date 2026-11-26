@@ -3,21 +3,20 @@ image:
   pullPolicy: Always
 ingress:
   enabled: true
+  className: traefik
   annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/from-to-www-redirect: "false"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-request-size@kubernetescrd
     cert-manager.io/cluster-issuer: acme-issuer
   hosts:
   - host: go.acim.net
     paths:
     - path: /
-      pathType: ImplementationSpecific
+      pathType: Prefix
   - host: go.ectobit.com
     paths:
     - path: /
-      pathType: ImplementationSpecific
+      pathType: Prefix
   tls:
   - secretName: van-tls
     hosts:
